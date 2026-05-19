@@ -24,9 +24,9 @@ You will receive an acknowledgment within 72 hours. We aim to release a fix with
 
 ## Scope
 
-ExecutorRuntime executes subprocess commands derived from RxP `RuntimeInvocation` inputs. The primary security surface is:
+CoreRunner executes subprocess commands derived from RxP `RuntimeInvocation` inputs. The primary security surface is:
 
-- **Arbitrary command execution** via the `command` field of an invocation — callers are responsible for vetting inputs; ExecutorRuntime executes what it is told
+- **Arbitrary command execution** via the `command` field of an invocation — callers are responsible for vetting inputs; CoreRunner executes what it is told
 - **Working directory escape** via `cwd` traversal patterns
 - **Environment variable injection** via the `env_overlay` field — secrets in the parent environment may be inherited if not explicitly cleared
 - **Argument injection** when callers concatenate untrusted strings into `command`
@@ -35,7 +35,7 @@ ExecutorRuntime executes subprocess commands derived from RxP `RuntimeInvocation
 
 ## Out of Scope
 
-- Vulnerabilities in the binaries that ExecutorRuntime invokes (e.g. `git`, `bun`, `python`); those are upstream concerns
+- Vulnerabilities in the binaries that CoreRunner invokes (e.g. `git`, `bun`, `python`); those are upstream concerns
 - Caller-side input validation — sanitizing untrusted input before constructing a `RuntimeInvocation` is the caller's responsibility
 - Issues requiring physical access to the host machine
 - Resource exhaustion via legitimate but heavy workloads (timeouts and resource limits are configuration concerns)

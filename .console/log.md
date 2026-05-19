@@ -104,3 +104,14 @@ truth; pre-push catches regressions before they hit GitHub.
 ## 2026-05-19 — Remove old src/executor_runtime/ tree
 
 Deleted legacy src/executor_runtime/ package now that all code lives in src/core_runner/. All 76 tests pass.
+
+## 2026-05-19 — Hard cutover: remove remaining ExecutorRuntime references
+
+- http_runner.py, async_http_runner.py: `pip install executor-runtime[http]` → `core-runner[http]`
+- tests/runners/test_http_runner.py: match string updated to `core-runner[http]`
+- SECURITY.md, CONTRIBUTING.md: ExecutorRuntime → CoreRunner throughout
+- errors.py docstring: "executor runtime package" → "core_runner package"
+- Deleted stale src/executor_runtime/ directory (pycache remnants from old package)
+- Deleted stale src/executor_runtime.egg-info/, src/core_runner.egg-info/
+- Rebuilt .venv (shebang was pointing to old /ExecutorRuntime/ path)
+- 76 tests pass

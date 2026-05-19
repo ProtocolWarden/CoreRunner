@@ -164,5 +164,5 @@ class TestImportGuard:
         """If httpx is missing and no client is injected, the constructor errors."""
         import core_runner.runners.http_runner as mod
         monkeypatch.setattr(mod, "httpx", None)
-        with pytest.raises(ImportError, match="executor-runtime\\[http\\]"):
+        with pytest.raises(ImportError, match="core-runner\\[http\\]"):
             HttpRunner()

@@ -1,6 +1,6 @@
-# Contributing to ExecutorRuntime
+# Contributing to CoreRunner
 
-ExecutorRuntime is the runtime execution layer for RxP-style invocation requests. It executes normalized runtime invocations (subprocess execution, working directory control, environment overlay, timeout, stdout/stderr capture, exit-code normalization, artifact collection) and returns normalized runtime results.
+CoreRunner is the runtime execution layer for RxP-style invocation requests. It executes normalized runtime invocations (subprocess execution, working directory control, environment overlay, timeout, stdout/stderr capture, exit-code normalization, artifact collection) and returns normalized runtime results.
 
 ## Before You Start
 
@@ -11,8 +11,8 @@ ExecutorRuntime is the runtime execution layer for RxP-style invocation requests
 ## Development Setup
 
 ```bash
-git clone https://github.com/ProtocolWarden/ExecutorRuntime.git
-cd ExecutorRuntime
+git clone https://github.com/ProtocolWarden/CoreRunner.git
+cd CoreRunner
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
@@ -32,7 +32,7 @@ ruff check src/
 
 ## Scope Discipline
 
-ExecutorRuntime intentionally has a narrow scope. Do **not** add:
+CoreRunner intentionally has a narrow scope. Do **not** add:
 
 - Schedulers, queues, or workflow orchestration
 - Plugin systems or extension marketplaces

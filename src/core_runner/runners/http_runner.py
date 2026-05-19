@@ -51,7 +51,7 @@ class HttpRunner:
         if httpx is None and client is None:
             raise ImportError(
                 "HttpRunner requires httpx. Install with "
-                "`pip install executor-runtime[http]`"
+                "`pip install core-runner[http]`"
             )
         self._follow_redirects = follow_redirects
         self._verify = verify
