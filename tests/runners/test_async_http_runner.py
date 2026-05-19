@@ -5,8 +5,8 @@ from __future__ import annotations
 
 import httpx
 
-from executor_runtime.contracts.invocation import RuntimeInvocation
-from executor_runtime.runners.async_http_runner import AsyncHttpRunner
+from core_runner.contracts.invocation import RuntimeInvocation
+from core_runner.runners.async_http_runner import AsyncHttpRunner
 
 KICKOFF_URL = "http://example.test/api/workflows/foo/run"
 POLL_TEMPLATE = "http://example.test/api/workflows/runs/{run_id}"

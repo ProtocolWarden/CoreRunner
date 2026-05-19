@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 from datetime import UTC, datetime
 
-from executor_runtime.contracts.result import RuntimeResult
+from core_runner.contracts.result import RuntimeResult
 
 
 def test_result_defaults_artifacts_to_empty_list() -> None:

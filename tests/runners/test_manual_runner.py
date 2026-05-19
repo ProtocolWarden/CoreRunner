@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 from datetime import UTC, datetime
 
-from executor_runtime.contracts.invocation import RuntimeInvocation
-from executor_runtime.contracts.result import RuntimeResult
-from executor_runtime.runners.manual_runner import ManualRunner
+from core_runner.contracts.invocation import RuntimeInvocation
+from core_runner.contracts.result import RuntimeResult
+from core_runner.runners.manual_runner import ManualRunner
 
 
 def _invocation(**overrides) -> RuntimeInvocation:

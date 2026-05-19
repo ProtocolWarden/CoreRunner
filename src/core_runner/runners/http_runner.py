@@ -28,8 +28,8 @@ try:
 except ImportError:  # pragma: no cover - dep is optional
     httpx = None  # type: ignore[assignment]
 
-from executor_runtime.contracts.invocation import RuntimeInvocation
-from executor_runtime.contracts.result import RuntimeResult
+from core_runner.contracts.invocation import RuntimeInvocation
+from core_runner.contracts.result import RuntimeResult
 
 
 class HttpRunner:

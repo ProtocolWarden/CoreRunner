@@ -1,5 +1,5 @@
-repo_key: ExecutorRuntime
-src_root: src/executor_runtime
+repo_key: CoreRunner
+src_root: src/core_runner
 tests_root: tests
 
 # ---------------------------------------------------------------------------
@@ -19,27 +19,33 @@ audit:
   cross_repo:
     platform_manifest_repo: ../PlatformManifest
 
-  # subprocess_runner.py constructs the env overlay for each subprocess run —
-  # legitimately reads os.environ as the env-mutation layer.
+  # process.py merges the env overlay (os.environ.copy() + update) —
+  # subprocess_runner.py delegates to it; both legitimately touch os.environ.
   c13_allowed_paths:
-    - "src/executor_runtime/runners/subprocess_runner.py"
+    - "src/core_runner/process.py"
+    - "src/core_runner/runners/subprocess_runner.py"
   exclude_paths:
     T1:
-      - "src/executor_runtime/contracts/**"
-      - src/executor_runtime/errors.py
-      - "src/executor_runtime/io/**"
-      - src/executor_runtime/runners/base.py
+      - "src/core_runner/contracts/**"
+      - src/core_runner/errors.py
+      - "src/core_runner/io/**"
+      - src/core_runner/runners/base.py
     T6:
-      - "src/executor_runtime/contracts/**"
-      - src/executor_runtime/errors.py
-      - "src/executor_runtime/io/**"
-      - src/executor_runtime/runners/base.py
+      - "src/core_runner/contracts/**"
+      - src/core_runner/errors.py
+      - "src/core_runner/io/**"
+      - src/core_runner/runners/base.py
     T7:
-      - "src/executor_runtime/contracts/**"
-      - src/executor_runtime/errors.py
-      - "src/executor_runtime/io/**"
-      - src/executor_runtime/runners/base.py
+      - "src/core_runner/contracts/**"
+      - src/core_runner/errors.py
+      - "src/core_runner/io/**"
+      - src/core_runner/runners/base.py
+    X2:
+      # PlatformManifest node key will be updated to CoreRunner in Phase 4
+      # (ADR 0006). Until then the CoreRunner→RxP edge is registered under
+      # executor_runtime in the manifest — exclude to avoid false positives.
+      - "src/core_runner/contracts/**"
     D11:
       # http_runner / async_http_runner share _build_content_kwargs by
       # design — sync/async pair of the same runner shape.
-      - "src/executor_runtime/runners/**"
+      - "src/core_runner/runners/**"

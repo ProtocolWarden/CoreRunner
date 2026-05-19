@@ -15,8 +15,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from executor_runtime.contracts.invocation import RuntimeInvocation
-from executor_runtime.contracts.result import RuntimeResult
+from core_runner.contracts.invocation import RuntimeInvocation
+from core_runner.contracts.result import RuntimeResult
 
 Dispatcher = Callable[[RuntimeInvocation], RuntimeResult]
 

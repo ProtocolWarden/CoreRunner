@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""ExecutorRuntime consumes the canonical RxP RuntimeInvocation contract.
+"""CoreRunner consumes the canonical RxP RuntimeInvocation contract.
 
-Re-exported here so callers can ``from executor_runtime.contracts
+Re-exported here so callers can ``from core_runner.contracts
 import RuntimeInvocation`` without depending on the RxP package
 directly.
 """

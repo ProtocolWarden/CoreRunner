@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""ExecutorRuntime — dispatch by RxP runtime_kind.
+"""CoreRunner — dispatch by RxP runtime_kind.
 
 Registers a ``RuntimeRunner`` per runtime_kind and routes each
 invocation to the right runner. Default registry only contains
@@ -8,7 +8,7 @@ inject additional runners (e.g. ``ManualRunner``, future
 ``HttpRunner``) at construction.
 
 When an invocation arrives for a runtime_kind with no registered
-runner, ExecutorRuntime returns a ``rejected`` RuntimeResult rather
+runner, CoreRunner returns a ``rejected`` RuntimeResult rather
 than raising — same posture as the missing-working-directory check
 in ``SubprocessRunner``.
 """
@@ -16,14 +16,14 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from executor_runtime.contracts.invocation import RuntimeInvocation
-from executor_runtime.contracts.result import RuntimeResult
-from executor_runtime.io.json_io import write_result
-from executor_runtime.runners.base import RuntimeRunner
-from executor_runtime.runners.subprocess_runner import SubprocessRunner
+from core_runner.contracts.invocation import RuntimeInvocation
+from core_runner.contracts.result import RuntimeResult
+from core_runner.io.json_io import write_result
+from core_runner.runners.base import RuntimeRunner
+from core_runner.runners.subprocess_runner import SubprocessRunner
 
 
-class ExecutorRuntime:
+class CoreRunner:
     def __init__(
         self,
         *,

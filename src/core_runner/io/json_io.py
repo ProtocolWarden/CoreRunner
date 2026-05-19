@@ -3,8 +3,8 @@
 import json
 from pathlib import Path
 
-from executor_runtime.contracts.invocation import RuntimeInvocation
-from executor_runtime.contracts.result import RuntimeResult
+from core_runner.contracts.invocation import RuntimeInvocation
+from core_runner.contracts.result import RuntimeResult
 
 
 def read_invocation(path: str) -> RuntimeInvocation:

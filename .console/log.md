@@ -3,6 +3,25 @@
 _Chronological continuity log. Decisions, stop points, what changed and why._
 _Not a task tracker — that's backlog.md. Keep entries concise and dated._
 
+## 2026-05-19 — Phase 1 custodian fixes
+
+- C13: added src/core_runner/process.py to c13_allowed_paths (os.environ.copy() is the env-overlay layer).
+- T7: renamed tests/test_safe_run.py → tests/test_process.py to match parallel naming convention.
+- X2: added contracts/** to X2 exclude_paths — PlatformManifest still has executor_runtime node key; CoreRunner→RxP edge will be wired in Phase 4 (ADR 0006).
+
+## 2026-05-19 — ADR 0006 Phase 1: CoreRunner rename + safe_run() extraction
+
+- Copied src/executor_runtime/ → src/core_runner/; bulk-renamed all imports, class names, error names.
+- Created src/core_runner/process.py: SafeRunResult dataclass + safe_run() primitive (start_new_session, os.killpg on timeout, transient SIGTERM handler). No RxP dependency.
+- Rewrote src/core_runner/runners/subprocess_runner.py to delegate to safe_run() — removes duplication.
+- Updated src/core_runner/__init__.py: exports CoreRunner, safe_run, SafeRunResult.
+- Updated pyproject.toml: name → core-runner, description updated, Repository URL → CoreRunner.
+- Updated .custodian/config.yaml: repo_key → CoreRunner, src_root → src/core_runner, all path patterns updated.
+- Bulk-updated all test imports: executor_runtime → core_runner, ExecutorRuntime → CoreRunner.
+- Added tests/test_safe_run.py: 11 tests covering zero-exit, nonzero-exit, stdout/stderr capture, env overlay, cwd, timeout/kill, process-group kill, capture_output=False, dataclass shape. 76 tests pass.
+- README rewritten for CoreRunner + dual surface (safe_run primitive + CoreRunner.run RxP path).
+- src/executor_runtime/ left in place until GitHub repo rename (Phase 6) — old package unused by tests.
+
 - 2026-05-19 — Removed live archon references from test fixtures. Updated
   test_manual_runner.py (archon → dag_executor, archon-workflow → dag-executor).
   Updated test_async_http_runner.py (archon-workflow → dag-executor). 65 tests pass.
@@ -81,3 +100,7 @@ truth; pre-push catches regressions before they hit GitHub.
 
 - Added CLAUDE.md to .gitignore
 - Added .custodian/tmp*.yaml to exclude custodian audit temp files
+
+## 2026-05-19 — Remove old src/executor_runtime/ tree
+
+Deleted legacy src/executor_runtime/ package now that all code lives in src/core_runner/. All 76 tests pass.
