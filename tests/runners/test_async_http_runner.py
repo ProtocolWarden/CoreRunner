@@ -26,7 +26,7 @@ def _invocation(metadata_extra: dict | None = None, **overrides) -> RuntimeInvoc
         metadata.update(metadata_extra)
     defaults = dict(
         invocation_id="inv-1",
-        runtime_name="archon-workflow",
+        runtime_name="dag-executor",
         runtime_kind="http_async",
         working_directory="/tmp",
         command=["unused"],

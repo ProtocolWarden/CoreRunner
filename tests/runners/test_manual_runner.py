@@ -9,10 +9,10 @@ from executor_runtime.runners.manual_runner import ManualRunner
 def _invocation(**overrides) -> RuntimeInvocation:
     defaults = dict(
         invocation_id="inv-1",
-        runtime_name="archon",
+        runtime_name="dag_executor",
         runtime_kind="manual",
         working_directory="/tmp",
-        command=["archon-workflow", "--run-id", "inv-1"],
+        command=["dag-executor", "--run-id", "inv-1"],
         environment={},
         timeout_seconds=300,
         input_payload_path=None,
