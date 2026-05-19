@@ -3,6 +3,12 @@
 _Chronological continuity log. Decisions, stop points, what changed and why._
 _Not a task tracker — that's backlog.md. Keep entries concise and dated._
 
+## 2026-05-19 — Phase 1 custodian fixes
+
+- C13: added src/core_runner/process.py to c13_allowed_paths (os.environ.copy() is the env-overlay layer).
+- T7: renamed tests/test_safe_run.py → tests/test_process.py to match parallel naming convention.
+- X2: added contracts/** to X2 exclude_paths — PlatformManifest still has executor_runtime node key; CoreRunner→RxP edge will be wired in Phase 4 (ADR 0006).
+
 ## 2026-05-19 — ADR 0006 Phase 1: CoreRunner rename + safe_run() extraction
 
 - Copied src/executor_runtime/ → src/core_runner/; bulk-renamed all imports, class names, error names.
