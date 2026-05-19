@@ -41,9 +41,7 @@ audit:
       - "src/core_runner/io/**"
       - src/core_runner/runners/base.py
     X2:
-      # PlatformManifest node key will be updated to CoreRunner in Phase 4
-      # (ADR 0006). Until then the CoreRunner→RxP edge is registered under
-      # executor_runtime in the manifest — exclude to avoid false positives.
+      # The CoreRunner→RxP edge is registered under core_runner in the manifest.
       - "src/core_runner/contracts/**"
     D11:
       # http_runner / async_http_runner share _build_content_kwargs by
