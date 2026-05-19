@@ -3,14 +3,17 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "executor-runtime"
+name = "core-runner"
 version = "0.1.0"
-description = "Runtime execution layer for normalized RxP invocations"
+description = "Process-group-safe subprocess primitives and RxP invocation runner"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   "rxp @ git+https://github.com/ProtocolWarden/RxP.git",
 ]
+
+[project.urls]
+Repository = "https://github.com/ProtocolWarden/CoreRunner"
 
 [project.optional-dependencies]
 http = [

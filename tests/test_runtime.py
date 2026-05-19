@@ -3,25 +3,25 @@
 import sys
 from pathlib import Path
 
-from executor_runtime.contracts.invocation import RuntimeInvocation
-from executor_runtime.contracts.result import RuntimeResult
-from executor_runtime.runners.subprocess_runner import SubprocessRunner
-from executor_runtime.runtime import ExecutorRuntime
+from core_runner.contracts.invocation import RuntimeInvocation
+from core_runner.contracts.result import RuntimeResult
+from core_runner.runners.subprocess_runner import SubprocessRunner
+from core_runner.runtime import CoreRunner
 
 
 def test_default_facade_uses_subprocess_runner() -> None:
-    runtime = ExecutorRuntime()
+    runtime = CoreRunner()
     assert isinstance(runtime.runner, SubprocessRunner)
 
 
 def test_is_registered_reports_registered_kinds() -> None:
-    runtime = ExecutorRuntime()
+    runtime = CoreRunner()
     assert runtime.is_registered("subprocess") is True
     assert runtime.is_registered("manual") is False
 
 
 def test_facade_returns_runtime_result(tmp_path: Path) -> None:
-    runtime = ExecutorRuntime()
+    runtime = CoreRunner()
     invocation = RuntimeInvocation(
         invocation_id="inv-facade",
         runtime_name="local",

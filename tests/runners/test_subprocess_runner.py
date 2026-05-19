@@ -2,8 +2,8 @@
 import sys
 from pathlib import Path
 
-from executor_runtime.contracts.invocation import RuntimeInvocation
-from executor_runtime.runners.subprocess_runner import SubprocessRunner
+from core_runner.contracts.invocation import RuntimeInvocation
+from core_runner.runners.subprocess_runner import SubprocessRunner
 
 
 def _invocation(tmp_path: Path, command: list[str], **overrides) -> RuntimeInvocation:

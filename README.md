@@ -1,33 +1,33 @@
-# ExecutorRuntime
+# CoreRunner
 
-`ExecutorRuntime` is the generic runtime execution layer for [RxP](https://github.com/ProtocolWarden/RxP)-shaped invocations. It dispatches by `runtime_kind` to a registered runner and returns a normalized RxP `RuntimeResult`.
+`CoreRunner` is the process-group-safe subprocess library for the ProtocolWarden ecosystem. It provides two surfaces:
+
+1. **`safe_run()` primitive** — standalone, no RxP dependency. Used by TeamExecutor, DAGExecutor, and CritiqueExecutor to replace raw `subprocess.run()` calls with full process-group safety.
+2. **`CoreRunner.run(invocation)`** — full RxP invocation runner (stdout/stderr capture to files, ArtifactDescriptor production). Used by OperationsCenter's `direct_local` and `aider_local` adapters.
 
 ```text
-RuntimeInvocation → ExecutorRuntime.run → RuntimeResult
-                       ├─ "subprocess" → SubprocessRunner
+safe_run(cmd, ...)    →  SafeRunResult            # lightweight primitive
+CoreRunner.run(inv)   →  RuntimeResult            # full RxP path
+
+RuntimeInvocation → CoreRunner.run → RuntimeResult
+                       ├─ "subprocess" → SubprocessRunner → safe_run()
                        ├─ "manual"     → ManualRunner (caller-supplied dispatcher)
                        └─ "http"       → HttpRunner   (sync request/response)
 ```
 
 ## What this repo is
 
-Generic runtime mechanics:
-
-- subprocess execution with process-group safety (`start_new_session=True`, `os.killpg(SIGKILL)` on timeout, transient SIGTERM handler)
-- environment overlay
-- working directory control
-- timeout enforcement
-- stdout/stderr capture to files
-- exit-code normalization
-- ArtifactDescriptor collection
-- dispatch-by-`runtime_kind` registry
+- Process-group-safe subprocess execution (`start_new_session=True`, `os.killpg(SIGKILL)` on timeout, transient SIGTERM handler that reaps child group on supervisor death)
+- Standalone `safe_run()` primitive — no RxP types, no artifact descriptors; just `SafeRunResult(returncode, stdout, stderr, timed_out)`
+- Environment overlay, working directory control, timeout enforcement
+- Stdout/stderr capture to files and ArtifactDescriptor collection (RxP path only)
+- Dispatch-by-`runtime_kind` registry
 
 ## What this repo is not
 
 - OperationsCenter — orchestration, planning, policy
 - SwitchBoard — lane/backend selection
-- SourceRegistry — source/fork/dependency tracking
-- CxRP — orchestration contract
+- TeamExecutor / DAGExecutor / CritiqueExecutor — AI execution backends (they consume `safe_run()`)
 - a scheduler / queue system / fork manager / agent framework
 
 ## Quick start
@@ -36,39 +36,63 @@ Generic runtime mechanics:
 pip install -e .
 ```
 
-Dispatch an RxP invocation by `runtime_kind`:
+### Primitive (no RxP dependency)
 
 ```python
-from executor_runtime import ExecutorRuntime
-result = ExecutorRuntime().run(invocation)   # → RuntimeResult
+from core_runner.process import safe_run
+
+result = safe_run(["python", "-c", "print('hello')"], timeout_seconds=30)
+print(result.returncode)  # 0
+print(result.stdout)      # "hello\n"
+print(result.timed_out)   # False
 ```
 
-See **Example usage** below for the full subprocess / manual / http flows.
+### Full RxP path
+
+```python
+from core_runner import CoreRunner
+result = CoreRunner().run(invocation)   # → RuntimeResult
+```
 
 ## Architecture
 
-Single-entry dispatcher: `ExecutorRuntime.run(invocation)` reads `invocation.runtime_kind` and forwards to a registered runner. Three are bundled — `SubprocessRunner` (process-group-safe local exec), `ManualRunner` (caller-supplied callable), `HttpRunner` (kickoff + poll-until-terminal). Every runner returns a normalized RxP `RuntimeResult`. See **Runners** below for the per-kind contract.
+`safe_run()` is the execution primitive — it owns all process-group logic. `SubprocessRunner` delegates to `safe_run()` and adds the file-capture / ArtifactDescriptor layer. `CoreRunner.run(invocation)` reads `invocation.runtime_kind` and forwards to a registered runner.
 
 ## Runners
 
 | Runner | runtime_kind | What it does |
 |---|---|---|
-| `SubprocessRunner` | `subprocess` | Local subprocess with process-group safety. Default registered runner. |
-| `ManualRunner` | `manual` | Forwards invocation to a caller-supplied dispatcher callable. For out-of-process services where ExecutorRuntime doesn't own the transport. |
-| `HttpRunner` | `http` | Synchronous HTTP request/response. URL/method/body read from `RuntimeInvocation.metadata`. |
-| `AsyncHttpRunner` | `http_async` | Async-shaped HTTP — kickoff (POST `→` 202 + run_id) then poll status URL until a terminal status. Sync from caller's POV. URL templates and JSON paths read from metadata. |
-
-SSE streaming for async APIs is still deferred — track-able via the `runtime_kind` vocabulary if/when added.
+| `SubprocessRunner` | `subprocess` | Local subprocess via `safe_run()`. Default registered runner. |
+| `ManualRunner` | `manual` | Forwards invocation to a caller-supplied dispatcher callable. |
+| `HttpRunner` | `http` | Synchronous HTTP request/response. |
+| `AsyncHttpRunner` | `http_async` | 202 kickoff + poll-until-terminal. |
 
 ## Example usage
 
-### Subprocess (default)
+### safe_run() — primitive
 
 ```python
-from executor_runtime import ExecutorRuntime
-from executor_runtime.contracts import RuntimeInvocation
+from core_runner.process import safe_run
 
-runtime = ExecutorRuntime()  # SubprocessRunner registered for "subprocess"
+result = safe_run(
+    ["python", "script.py", "--arg", "value"],
+    cwd="/path/to/project",
+    env={"MY_VAR": "value"},
+    timeout_seconds=60,
+)
+if result.timed_out:
+    print("timed out")
+elif result.returncode != 0:
+    print(f"failed: {result.stderr}")
+```
+
+### CoreRunner — subprocess (default)
+
+```python
+from core_runner import CoreRunner
+from core_runner.contracts import RuntimeInvocation
+
+runtime = CoreRunner()
 
 result = runtime.run(
     RuntimeInvocation(
@@ -88,76 +112,41 @@ result = runtime.run(
 print(result.status)  # "succeeded"
 ```
 
-### Manual (out-of-process service)
+### CoreRunner — manual (out-of-process service)
 
 ```python
-from executor_runtime import ExecutorRuntime
-from executor_runtime.runners import ManualRunner
+from core_runner import CoreRunner
+from core_runner.runners import ManualRunner
 
 def my_dispatcher(invocation):
-    # Your code: HTTP call, queue publish, RPC, whatever
     raw = call_external_service(...)
     return synthesize_runtime_result(invocation, raw)
 
-runtime = ExecutorRuntime()
+runtime = CoreRunner()
 runtime.register("manual", ManualRunner(my_dispatcher))
-
 result = runtime.run(invocation_with_kind_manual)
-```
-
-### HTTP (synchronous)
-
-```python
-from executor_runtime import ExecutorRuntime
-from executor_runtime.runners import HttpRunner
-
-runtime = ExecutorRuntime()
-runtime.register("http", HttpRunner())
-
-# Invocation metadata carries http.url + http.method + http.body
-result = runtime.run(invocation_with_runtime_kind_http)
-```
-
-### HTTP (async-shaped — 202 + poll)
-
-```python
-from executor_runtime import ExecutorRuntime
-from executor_runtime.runners import AsyncHttpRunner
-
-runtime = ExecutorRuntime()
-runtime.register("http_async", AsyncHttpRunner())
-
-# Invocation metadata carries:
-#   http.url                  — kickoff URL (POST endpoint, 202 → {"run_id": "..."})
-#   http.poll_url_template    — e.g. "https://api/runs/{run_id}"
-#   http.poll_run_id_path     — dotted path to extract run_id from kickoff response
-#   http.poll_status_path     — dotted path to extract status from poll response
-#   http.poll_terminal_states — comma-separated, e.g. "completed,failed,cancelled"
-#   http.poll_success_states  — subset (default: "completed")
-#   http.poll_interval_seconds — default 2.0
-result = runtime.run(invocation_with_runtime_kind_http_async)
 ```
 
 ## Installation
 
 ```bash
-pip install executor-runtime
+pip install core-runner
 # or with HTTP support:
-pip install "executor-runtime[http]"
+pip install "core-runner[http]"
 ```
 
 For development:
 
 ```bash
-git clone https://github.com/ProtocolWarden/ExecutorRuntime.git
-cd ExecutorRuntime
+git clone https://github.com/ProtocolWarden/CoreRunner.git
+cd CoreRunner
 pip install -e ".[dev,http]"
 pytest -q
 ```
 
 ## Contracts
 
-ExecutorRuntime consumes RxP types directly — no parallel dataclasses:
+CoreRunner consumes RxP types directly:
 
 ```python
 from rxp.contracts import RuntimeInvocation, RuntimeResult, ArtifactDescriptor

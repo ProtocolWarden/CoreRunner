@@ -5,8 +5,8 @@ import json
 import httpx
 import pytest
 
-from executor_runtime.contracts.invocation import RuntimeInvocation
-from executor_runtime.runners.http_runner import HttpRunner
+from core_runner.contracts.invocation import RuntimeInvocation
+from core_runner.runners.http_runner import HttpRunner
 
 
 def _invocation(**overrides) -> RuntimeInvocation:
@@ -162,7 +162,7 @@ class TestFailurePaths:
 class TestImportGuard:
     def test_construction_without_httpx_raises_when_no_client(self, monkeypatch):
         """If httpx is missing and no client is injected, the constructor errors."""
-        import executor_runtime.runners.http_runner as mod
+        import core_runner.runners.http_runner as mod
         monkeypatch.setattr(mod, "httpx", None)
         with pytest.raises(ImportError, match="executor-runtime\\[http\\]"):
             HttpRunner()

@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from executor_runtime.contracts.invocation import RuntimeInvocation
+from core_runner.contracts.invocation import RuntimeInvocation
 
 
 def _base_invocation_kwargs() -> dict:
