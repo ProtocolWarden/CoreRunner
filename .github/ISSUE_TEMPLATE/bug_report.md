@@ -43,7 +43,7 @@ Which runner exhibited the bug?
 
 - OS: 
 - Python version: 
-- ExecutorRuntime version / commit: 
+- CoreRunner version / commit: 
 - Binary being invoked (e.g. git, bun, python):
 
 ## Relevant Output

@@ -19,7 +19,7 @@ How you imagine it working. Include API examples if relevant.
 
 ## Affected Layer
 
-Which part of ExecutorRuntime does this touch?
+Which part of CoreRunner does this touch?
 
 - [ ] RuntimeInvocation contract (input parsing/validation)
 - [ ] Runner protocol / abstract base
@@ -37,7 +37,7 @@ Other approaches and why you ruled them out.
 
 ## Scope Check
 
-Confirm this change stays within ExecutorRuntime's scope:
+Confirm this change stays within CoreRunner's scope:
 - It belongs to runtime execution mechanics (not scheduling, routing, planning)
 - It does not duplicate functionality from SourceRegistry, SwitchBoard, OperationsCenter, or RxP
 - The input/output contracts remain RxP-compatible
