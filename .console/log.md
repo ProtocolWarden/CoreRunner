@@ -100,3 +100,7 @@ truth; pre-push catches regressions before they hit GitHub.
 
 - Added CLAUDE.md to .gitignore
 - Added .custodian/tmp*.yaml to exclude custodian audit temp files
+
+## 2026-05-19 — Remove old src/executor_runtime/ tree
+
+Deleted legacy src/executor_runtime/ package now that all code lives in src/core_runner/. All 76 tests pass.
