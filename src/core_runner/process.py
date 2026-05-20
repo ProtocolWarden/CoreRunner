@@ -17,6 +17,7 @@ from __future__ import annotations
 import os
 import signal
 import subprocess
+import threading
 from dataclasses import dataclass
 from typing import NoReturn
 
@@ -70,14 +71,20 @@ def safe_run(
             except (ProcessLookupError, OSError):
                 pass
 
-    prev_sigterm = signal.getsignal(signal.SIGTERM)
+    # signal.signal() only works from the main thread. When safe_run is called
+    # from a ThreadPoolExecutor (e.g. TeamExecutor parallel stages), skip the
+    # handler — _kill_group() is still called on timeout for cleanup.
+    in_main_thread = threading.current_thread() is threading.main_thread()
+    prev_sigterm: object = None
+    if in_main_thread:
+        prev_sigterm = signal.getsignal(signal.SIGTERM)
 
-    def _sigterm_handler(signum: int, _frame: object) -> NoReturn:
-        _kill_group()
-        signal.signal(signal.SIGTERM, prev_sigterm)
-        raise SystemExit(128 + signum)
+        def _sigterm_handler(signum: int, _frame: object) -> NoReturn:
+            _kill_group()
+            signal.signal(signal.SIGTERM, prev_sigterm)  # type: ignore[arg-type]
+            raise SystemExit(128 + signum)
 
-    signal.signal(signal.SIGTERM, _sigterm_handler)
+        signal.signal(signal.SIGTERM, _sigterm_handler)
     try:
         try:
             stdout_bytes, stderr_bytes = proc.communicate(timeout=timeout_seconds)
@@ -95,7 +102,8 @@ def safe_run(
                 timed_out=True,
             )
     finally:
-        signal.signal(signal.SIGTERM, prev_sigterm)
+        if in_main_thread:
+            signal.signal(signal.SIGTERM, prev_sigterm)  # type: ignore[arg-type]
 
     return SafeRunResult(
         returncode=proc.returncode,
