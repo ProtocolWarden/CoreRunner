@@ -121,3 +121,7 @@ Deleted legacy src/executor_runtime/ package now that all code lives in src/core
 - Deleted stale src/executor_runtime.egg-info/, src/core_runner.egg-info/
 - Rebuilt .venv (shebang was pointing to old /ExecutorRuntime/ path)
 - 76 tests pass
+
+## 2026-05-23 — Standardize pre-push hook
+
+- Updated `.hooks/pre-push` to the auto-discovering boundary-artifact variant (auto-locates PrivateManifest/dist artifact; extra custodian-multi fallback path).
