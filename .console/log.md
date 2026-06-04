@@ -1,5 +1,11 @@
 # Log
 
+## 2026-06-04 — Console reconciliation: enforce R1/R2
+
+- Confirmed tracked .console/ + docs are leak-free (no scrub-target identifiers) and log.md is under the 400-line R1 budget.
+- Added `audit.reconcile_enforce: true` to .custodian/config.yaml to flip Custodian R1/R2 from dormant to fail-closed (this repo is reconciled + clean).
+- Verified: `cl reconcile check` GREEN; custodian audit yields no R1/R2 findings (only pre-existing B2/W2).
+
 ## 2026-05-21 — Add closing console-context fence to CLAUDE.md
 
 Added <!-- /console-context --> end marker so OperatorConsole only
