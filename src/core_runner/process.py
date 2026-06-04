@@ -12,6 +12,7 @@ Key safety guarantees:
 - Transient SIGTERM handler — child group is killed if the Python supervisor
   is itself killed (OOM killer, supervisor stop)
 """
+
 from __future__ import annotations
 
 import os

@@ -11,6 +11,7 @@ Use this when ``runtime_kind == "manual"`` on the invocation. Future
 ``HttpRunner`` / ``ContainerRunner`` will cover ``"http"`` /
 ``"container"`` with concrete implementations.
 """
+
 from __future__ import annotations
 
 from collections.abc import Callable

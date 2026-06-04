@@ -17,6 +17,7 @@ backend-specific dispatcher and use ManualRunner instead.
 This runner installs no global state. Each ``run`` opens a short-lived
 ``httpx.Client`` so timeout/cancellation semantics are local to the call.
 """
+
 from __future__ import annotations
 
 import json
@@ -50,8 +51,7 @@ class HttpRunner:
     ) -> None:
         if httpx is None and client is None:
             raise ImportError(
-                "HttpRunner requires httpx. Install with "
-                "`pip install core-runner[http]`"
+                "HttpRunner requires httpx. Install with `pip install core-runner[http]`"
             )
         self._follow_redirects = follow_redirects
         self._verify = verify

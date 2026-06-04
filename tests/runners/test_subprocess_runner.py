@@ -47,7 +47,8 @@ def test_timeout_command_returns_timed_out(tmp_path: Path) -> None:
 def test_missing_working_directory_returns_rejected(tmp_path: Path) -> None:
     missing = tmp_path / "missing"
     inv = _invocation(
-        tmp_path, [sys.executable, "-c", "print('x')"],
+        tmp_path,
+        [sys.executable, "-c", "print('x')"],
         invocation_id="inv-missing",
         working_directory=str(missing),
         timeout_seconds=5,
@@ -91,7 +92,9 @@ def test_environment_overlay_visible_to_child_process(tmp_path: Path) -> None:
 
 def test_artifacts_returned_as_artifact_descriptors(tmp_path: Path) -> None:
     inv = _invocation(
-        tmp_path, [sys.executable, "-c", "print('hi')"], timeout_seconds=5,
+        tmp_path,
+        [sys.executable, "-c", "print('hi')"],
+        timeout_seconds=5,
     )
     result = SubprocessRunner().run(inv)
     assert len(result.artifacts) == 2

@@ -57,6 +57,7 @@ runner is reentrant.
 
 Each call uses a short-lived ``httpx.Client``; no global state.
 """
+
 from __future__ import annotations
 
 import json
@@ -97,8 +98,7 @@ class AsyncHttpRunner:
     ) -> None:
         if httpx is None and client is None:
             raise ImportError(
-                "AsyncHttpRunner requires httpx. Install with "
-                "`pip install core-runner[http]`"
+                "AsyncHttpRunner requires httpx. Install with `pip install core-runner[http]`"
             )
         self._follow_redirects = follow_redirects
         self._verify = verify
@@ -137,12 +137,11 @@ class AsyncHttpRunner:
 
         pending_raw = meta.get("http.poll_pending_codes") or ""
         try:
-            pending_codes = tuple(
-                int(s.strip()) for s in pending_raw.split(",") if s.strip()
-            )
+            pending_codes = tuple(int(s.strip()) for s in pending_raw.split(",") if s.strip())
         except ValueError:
             return _rejected(
-                invocation, started,
+                invocation,
+                started,
                 "http.poll_pending_codes must be comma-separated integers",
             )
 
@@ -187,18 +186,22 @@ class AsyncHttpRunner:
                 #  - server acknowledged async dispatch (status field absent
                 #    or non-terminal, e.g. Archon's {accepted, status:"started"})
                 if _is_synchronous_terminal(
-                    kickoff_resp, poll_status_path, terminal_states,
+                    kickoff_resp,
+                    poll_status_path,
+                    terminal_states,
                 ):
                     return _terminal_from_kickoff(
-                        invocation, started, kickoff_resp,
-                        success_states, poll_status_path,
+                        invocation,
+                        started,
+                        kickoff_resp,
+                        success_states,
+                        poll_status_path,
                     )
                 # Fall through to poll loop — kickoff was an ack, not a result.
             elif kickoff_resp.status_code != 202:
                 preview = kickoff_resp.text[:200] if kickoff_resp.text else ""
                 msg = (
-                    f"kickoff expected 202 (or 200), got HTTP "
-                    f"{kickoff_resp.status_code}: {preview}"
+                    f"kickoff expected 202 (or 200), got HTTP {kickoff_resp.status_code}: {preview}"
                 ).strip()
                 return _failed(invocation, started, msg)
 
@@ -208,7 +211,8 @@ class AsyncHttpRunner:
                 run_id_path = meta.get("http.poll_run_id_path")
                 if not run_id_path:
                     return _rejected(
-                        invocation, started,
+                        invocation,
+                        started,
                         "poll_url_template contains {run_id} but no poll_run_id_path provided",
                     )
                 try:
@@ -228,7 +232,9 @@ class AsyncHttpRunner:
             while True:
                 if _deadline_exceeded(deadline_monotonic):
                     return _timed_out(
-                        invocation, started, timeout,
+                        invocation,
+                        started,
+                        timeout,
                         TimeoutError("poll loop deadline exceeded"),
                         "poll",
                     )
@@ -249,7 +255,8 @@ class AsyncHttpRunner:
                         continue
                     preview = poll_resp.text[:200] if poll_resp.text else ""
                     return _failed(
-                        invocation, started,
+                        invocation,
+                        started,
                         f"poll expected HTTP 200, got {poll_resp.status_code}: {preview}".strip(),
                     )
                 try:
@@ -260,8 +267,7 @@ class AsyncHttpRunner:
                 status = _extract_path(poll_payload, poll_status_path)
                 if status is None:
                     msg = (
-                        f"poll response has no field at path "
-                        f"{poll_status_path!r}: {poll_payload!r}"
+                        f"poll response has no field at path {poll_status_path!r}: {poll_payload!r}"
                     )
                     return _failed(invocation, started, msg)
                 status_str = str(status)
@@ -280,8 +286,7 @@ class AsyncHttpRunner:
                         stderr_path=None,
                         artifacts=[],
                         error_summary=(
-                            None if success
-                            else f"backend reported terminal status: {status_str}"
+                            None if success else f"backend reported terminal status: {status_str}"
                         ),
                     )
 
@@ -454,9 +459,7 @@ def _timed_out(
     phase: str,
 ) -> RuntimeResult:
     note = (
-        f"{phase} exceeded timeout of {timeout}s: {exc}"
-        if timeout
-        else f"{phase} timed out: {exc}"
+        f"{phase} exceeded timeout of {timeout}s: {exc}" if timeout else f"{phase} timed out: {exc}"
     )
     return RuntimeResult(
         invocation_id=invocation.invocation_id,

@@ -1,11 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 ProtocolWarden
-import os
-import signal
 import sys
 import textwrap
-
-import pytest
 
 from core_runner.process import SafeRunResult, safe_run
 

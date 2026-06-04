@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Tests for HttpRunner — synchronous HTTP request/response runner."""
+
 import json
 
 import httpx
@@ -29,8 +30,9 @@ def _invocation(**overrides) -> RuntimeInvocation:
     return RuntimeInvocation(**defaults)
 
 
-def _stub_client(*, response: httpx.Response | None = None,
-                 raises: Exception | None = None) -> httpx.Client:
+def _stub_client(
+    *, response: httpx.Response | None = None, raises: Exception | None = None
+) -> httpx.Client:
     """Build an httpx.Client that returns / raises the configured outcome."""
 
     def _handler(request: httpx.Request) -> httpx.Response:
@@ -76,10 +78,12 @@ class TestHappyPath:
             return httpx.Response(200)
 
         client = httpx.Client(transport=httpx.MockTransport(_handler))
-        inv = _invocation(metadata={
-            "http.url": "http://example.test/api/health",
-            "http.method": "GET",
-        })
+        inv = _invocation(
+            metadata={
+                "http.url": "http://example.test/api/health",
+                "http.method": "GET",
+            }
+        )
         HttpRunner(client=client).run(inv)
         assert seen == ["GET"]
 
@@ -91,10 +95,12 @@ class TestHappyPath:
             return httpx.Response(200)
 
         client = httpx.Client(transport=httpx.MockTransport(_handler))
-        inv = _invocation(metadata={
-            "http.url": "http://example.test/run",
-            "http.body": json.dumps({"task": "hello"}),
-        })
+        inv = _invocation(
+            metadata={
+                "http.url": "http://example.test/run",
+                "http.body": json.dumps({"task": "hello"}),
+            }
+        )
         HttpRunner(client=client).run(inv)
         assert json.loads(seen[0]) == {"task": "hello"}
 
@@ -117,10 +123,17 @@ class TestFailurePaths:
         client = _stub_client()
         # Build an invocation directly without the default http.url metadata.
         inv = RuntimeInvocation(
-            invocation_id="inv-no-url", runtime_name="x", runtime_kind="http",
-            working_directory="/tmp", command=["x"], environment={},
-            timeout_seconds=10, input_payload_path=None, output_result_path=None,
-            artifact_directory=None, metadata={},
+            invocation_id="inv-no-url",
+            runtime_name="x",
+            runtime_kind="http",
+            working_directory="/tmp",
+            command=["x"],
+            environment={},
+            timeout_seconds=10,
+            input_payload_path=None,
+            output_result_path=None,
+            artifact_directory=None,
+            metadata={},
         )
         result = HttpRunner(client=client).run(inv)
         assert result.status == "rejected"
@@ -128,21 +141,25 @@ class TestFailurePaths:
 
     def test_invalid_body_json_returns_rejected(self):
         client = _stub_client()
-        inv = _invocation(metadata={
-            "http.url": "http://example.test/run",
-            "http.body": "{not-json",
-        })
+        inv = _invocation(
+            metadata={
+                "http.url": "http://example.test/run",
+                "http.body": "{not-json",
+            }
+        )
         result = HttpRunner(client=client).run(inv)
         assert result.status == "rejected"
         assert "invalid body" in (result.error_summary or "")
 
     def test_unknown_body_format_returns_rejected(self):
         client = _stub_client()
-        inv = _invocation(metadata={
-            "http.url": "http://example.test/run",
-            "http.body": "{}",
-            "http.body_format": "telepathy",
-        })
+        inv = _invocation(
+            metadata={
+                "http.url": "http://example.test/run",
+                "http.body": "{}",
+                "http.body_format": "telepathy",
+            }
+        )
         result = HttpRunner(client=client).run(inv)
         assert result.status == "rejected"
 
@@ -163,6 +180,7 @@ class TestImportGuard:
     def test_construction_without_httpx_raises_when_no_client(self, monkeypatch):
         """If httpx is missing and no client is injected, the constructor errors."""
         import core_runner.runners.http_runner as mod
+
         monkeypatch.setattr(mod, "httpx", None)
         with pytest.raises(ImportError, match="core-runner\\[http\\]"):
             HttpRunner()
