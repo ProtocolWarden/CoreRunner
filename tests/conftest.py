@@ -5,6 +5,7 @@
 Refuses to run unless invoked from inside this project's `.venv` —
 prevents accidental test runs against the global interpreter.
 """
+
 from __future__ import annotations
 
 import os

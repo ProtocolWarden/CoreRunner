@@ -10,6 +10,7 @@ Status values are RxP's runtime_status vocabulary (string literals):
 ``pending | running | succeeded | failed | timed_out | cancelled |
 rejected``.
 """
+
 from core_runner.contracts.invocation import RuntimeInvocation
 from core_runner.contracts.result import ArtifactDescriptor, RuntimeResult
 

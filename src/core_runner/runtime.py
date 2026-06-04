@@ -12,6 +12,7 @@ runner, CoreRunner returns a ``rejected`` RuntimeResult rather
 than raising — same posture as the missing-working-directory check
 in ``SubprocessRunner``.
 """
+
 from __future__ import annotations
 
 from datetime import UTC, datetime

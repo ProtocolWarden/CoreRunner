@@ -5,9 +5,9 @@
 Provides stdout/stderr capture to files and ArtifactDescriptor production
 on top of the process-group-safe safe_run() primitive.
 """
+
 from __future__ import annotations
 
-import os
 from datetime import UTC, datetime
 from pathlib import Path
 
