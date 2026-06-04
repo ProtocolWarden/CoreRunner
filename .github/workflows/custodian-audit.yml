@@ -55,4 +55,7 @@ jobs:
           echo "REPOGRAPH_BOUNDARY_ARTIFACT_FILE=$dest" >> "$GITHUB_ENV"
       - name: Run Custodian audit
         run: |
+          # .custodian/config.yaml flags an unset core.hooksPath (W2); wire it
+          # like a developer checkout would so the audit reflects real findings.
+          git config core.hooksPath .hooks
           custodian-multi --repos . --fail-on-findings --no-color
