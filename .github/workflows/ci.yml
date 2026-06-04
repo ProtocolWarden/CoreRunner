@@ -42,7 +42,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install dependencies
-        run: pip install -e ".[dev]"
+      - name: Create project virtualenv and install
+        # tests/conftest.py guards against running against the global
+        # interpreter and requires this project's ./.venv. Build it here so
+        # CI exercises the same environment a developer checkout uses.
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/pip install -e ".[dev]"
       - name: Run tests
-        run: pytest -q
+        run: .venv/bin/pytest -q
