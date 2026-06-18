@@ -31,17 +31,14 @@ audit:
   exclude_paths:
     T1:
       - "src/core_runner/contracts/**"
-      - src/core_runner/errors.py
       - "src/core_runner/io/**"
       - src/core_runner/runners/base.py
     T6:
       - "src/core_runner/contracts/**"
-      - src/core_runner/errors.py
       - "src/core_runner/io/**"
       - src/core_runner/runners/base.py
     T7:
       - "src/core_runner/contracts/**"
-      - src/core_runner/errors.py
       - "src/core_runner/io/**"
       - src/core_runner/runners/base.py
     X2:
