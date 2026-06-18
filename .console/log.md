@@ -131,3 +131,13 @@ Deleted legacy src/executor_runtime/ package now that all code lives in src/core
 ## 2026-05-23 — Standardize pre-push hook
 
 - Updated `.hooks/pre-push` to the auto-discovering boundary-artifact variant (auto-locates PrivateManifest/dist artifact; extra custodian-multi fallback path).
+
+## 2026-06-18 — cleanup: delete unused CoreRunnerError
+
+Ecosystem incomplete-integration remediation (Phase 3 DELETE). CoreRunnerError
+(errors.py) was a base exception from the original ExecutorRuntime seed —
+raised nowhere, caught nowhere, NOT exported in __init__ __all__ (which exports
+CoreRunner/safe_run/SafeRunResult), no cross-repo use. Deleted the whole
+errors.py (it held only that class) + its now-stale T1/T6/T7 exclude_paths
+entries in .custodian/config.yaml. 76 tests green; ruff + audit (B2 env) +
+doctor clean.
